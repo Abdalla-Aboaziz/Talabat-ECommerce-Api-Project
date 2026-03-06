@@ -12,6 +12,6 @@
         public string LastName { get; set; } = default!;
 
         public ApplicationUser user { get; set; } = default!;
-        public string UserId { get; set; } = default!; // fk
+        public string UserId { get; set; } = default!; // fk [Unique Constraint ]
     }
 }

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECommerce.Presistance.IdentiyData.DbContext
+namespace ECommerce.Presistance.IdentityData.DbContext
 {
     public class StoreIdentityDbContext:IdentityDbContext<ApplicationUser>
     {

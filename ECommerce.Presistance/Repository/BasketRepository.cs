@@ -20,7 +20,7 @@ namespace ECommerce.Presistance.Repository
         {
             _database = connection.GetDatabase();
         }
-        public async Task<CustomerBasket> CreateOrUpdateBasketAsync(CustomerBasket basket, TimeSpan timetolive = default)
+        public async Task<CustomerBasket?> CreateOrUpdateBasketAsync(CustomerBasket basket, TimeSpan timetolive = default)
         {
             var JsonBasket =JsonSerializer.Serialize(basket);
             var IsCreatedOrUpdated = await  _database.StringSetAsync(basket.Id, JsonBasket,
@@ -30,7 +30,7 @@ namespace ECommerce.Presistance.Repository
                 return await GetBasketAsync(basket.Id);
             }
             else
-            {
+            { 
                 return null;
             }
         }
@@ -38,7 +38,7 @@ namespace ECommerce.Presistance.Repository
         public async Task<bool> DeleteCustomerBasketAsync(string basketId)=> await _database.KeyDeleteAsync(basketId);
 
 
-        public async Task<CustomerBasket> GetBasketAsync(string basketId)
+        public async Task<CustomerBasket?> GetBasketAsync(string basketId)
         {
            var Basket= await _database.StringGetAsync(basketId);
             if (Basket.IsNullOrEmpty)
@@ -47,7 +47,7 @@ namespace ECommerce.Presistance.Repository
             }
             else
             {
-                return JsonSerializer.Deserialize<CustomerBasket>(Basket);
+                return JsonSerializer.Deserialize<CustomerBasket>(Basket!);
             }
         }
     }

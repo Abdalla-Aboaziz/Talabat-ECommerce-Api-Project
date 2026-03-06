@@ -1,7 +1,4 @@
-﻿using ECommerce.Domain.Contracts;
-using ECommerce.Presistance.Data.DBContexts;
-using ECommerce.Presistance.IdentiyData.DbContext;
-using Microsoft.EntityFrameworkCore;
+﻿
 
 namespace ECommerceWeb.Extentions
 {

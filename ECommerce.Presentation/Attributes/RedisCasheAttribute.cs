@@ -19,7 +19,9 @@ namespace ECommerce.Presentation.Attributes
         {
             _durationInMin = DurationInMin;
         }
-        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+
+        // This method runs before and after the action method execution.
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next) //context=> Take the context of the request and response and next => delegate to excute the controller action
         {
 
             // Get Cach Service from Di Container
@@ -42,14 +44,13 @@ namespace ECommerce.Presentation.Attributes
                 return;
             }
 
-            // if data in cach return data and skip the controller
-            // if data not in cach excute the controller and store the data in cach if 200 OK 
+            // If data is not in cache, execute the action and cache the result if it's 200 OK
 
             var executedContext = await next.Invoke(); // excute the controller
             if(executedContext.Result is OkObjectResult okObjectResult)
             {
                 // store data in cach
-                await cachService.SetAsync(cachKey, okObjectResult.Value, TimeSpan.FromMinutes(_durationInMin));
+                await cachService.SetAsync(cachKey, okObjectResult.Value!, TimeSpan.FromMinutes(_durationInMin));
             }
 
         }

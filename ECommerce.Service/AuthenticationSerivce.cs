@@ -5,14 +5,9 @@ using ECommerce.Shared.IdentityDtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerce.Service
 {
@@ -51,13 +46,13 @@ namespace ECommerce.Service
                 return Error.InvalidCredintails("Password InvalidCred");
             var Token = await CreateTokenAsync(user);
 
-            return new UserDto(user.Email!,user.DisplayName, Token);
-         
+            return new UserDto(user.Email!, user.DisplayName, Token);
+
         }
 
         public async Task<Result<UserDto>> RegisterAsync(RegisterDto registerDto)
         {
-           var User = new ApplicationUser
+            var User = new ApplicationUser
             {
                 Email = registerDto.Email,
                 DisplayName = registerDto.DisplayName,
@@ -72,7 +67,7 @@ namespace ECommerce.Service
                 return new UserDto(User.Email, User.DisplayName, Token);
             }
 
-            return result.Errors.Select(e => Error.Validation(e.Code,e.Description)).ToList();
+            return result.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToList();
 
         }
         private async Task<string> CreateTokenAsync(ApplicationUser user)
@@ -90,27 +85,22 @@ namespace ECommerce.Service
             var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role,role));
+                claims.Add(new Claim(ClaimTypes.Role, role));
             }
             var secretKey = _configration["JwtOptions:secretKey"];
             //EncodingSecretKey
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-            var cred = new SigningCredentials(key,SecurityAlgorithms.HmacSha256);
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var Token = new JwtSecurityToken
                 (
                 issuer: _configration["JwtOptions:issuer"],
                 audience: _configration["JwtOptions:audience"],
-                expires :DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddHours(1),
                 claims: claims,
-                signingCredentials : cred
+                signingCredentials: cred
 
                 );
             return new JwtSecurityTokenHandler().WriteToken(Token);
-
-
-
-
-
         }
     }
 }

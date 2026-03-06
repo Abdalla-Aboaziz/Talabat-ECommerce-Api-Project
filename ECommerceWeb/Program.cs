@@ -1,28 +1,4 @@
 
-using ECommerce.Domain.Contracts;
-using ECommerce.Domain.Entities.IdentityModule;
-using ECommerce.Presistance.Data.DataSeeding;
-using ECommerce.Presistance.Data.DBContexts;
-using ECommerce.Presistance.IdentityData.DataSeed;
-using ECommerce.Presistance.IdentiyData.DbContext;
-using ECommerce.Presistance.Repository;
-using ECommerce.Service;
-using ECommerce.Service.MappingProfiles;
-using ECommerce.ServiceAbstraction;
-using ECommerceWeb.CustomeMiddleWare;
-using ECommerceWeb.Extentions;
-using ECommerceWeb.Factory;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using StackExchange.Redis;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace ECommerceWeb
 {
     public class Program
@@ -42,68 +18,68 @@ namespace ECommerceWeb
             builder.Services.AddDbContext<StoreDbContext>(opt =>
                 {
                     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-                }); 
+                });
             #endregion
 
 
             #region Service Registeration
-            builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             //builder.Services.AddAutoMapper(x=>x.AddProfile(typeof(ProductProfile)));
             //builder.Services.AddTransient<ProductPictureResolver>(); // Register the resolver
             builder.Services.AddAutoMapper(typeof(ServiceAssemplyRefrence).Assembly);
-            builder.Services.AddScoped<IProductServices,ProductService>();
-            builder.Services.AddKeyedScoped<IDataInitializer,DataIntializer>("Default");
+            builder.Services.AddScoped<IProductServices, ProductService>();
+            builder.Services.AddKeyedScoped<IDataInitializer, DataIntializer>("Default");
             builder.Services.AddKeyedScoped<IDataInitializer, IdentityDataInitalizer>("Identity");
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(s =>
             {
                 return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!);
             });
-            builder.Services.AddScoped<IBasketRepository,BasketRepository>();
+            builder.Services.AddScoped<IBasketRepository, BasketRepository>();
             builder.Services.AddScoped<IBasketServices, BasketServices>();
-            builder.Services.AddScoped<ICachRepository,CachRepository>();
-            builder.Services.AddScoped<ICashService,CashService>();
+            builder.Services.AddScoped<ICachRepository, CachRepository>();
+            builder.Services.AddScoped<ICashService, CashService>();
             builder.Services.AddScoped<IAuthenticationSerivce, AuthenticationSerivce>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.Configure<ApiBehaviorOptions>(option =>
             {
                 option.InvalidModelStateResponseFactory = ApiResponceFactory.GenerateApiValidationResponce; // Validation ModelState
-                
+
             });
             builder.Services.AddDbContext<StoreIdentityDbContext>(option =>
             {
-               option.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+                option.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
             });
 
             //  builder.Services.AddIdentity<ApplicationUser,IdentityRole>(); 
             builder.Services.AddIdentityCore<ApplicationUser>().AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<StoreIdentityDbContext>();
 
+            // Configure JWT Bearer authentication and define token validation parameters.
             builder.Services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(opt =>
             {
-                opt.SaveToken=true;
+                opt.SaveToken = true;
                 opt.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidIssuer=builder.Configuration["JwtOptions:issuer"],
-                        ValidAudience=builder.Configuration["JwtOptions:audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtOptions:secretKey"]!))
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = builder.Configuration["JwtOptions:issuer"],
+                    ValidAudience = builder.Configuration["JwtOptions:audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtOptions:secretKey"]!))
                 };
             });
-
 
             #endregion
 
             var app = builder.Build();
 
             #region DataSeeding
-            await  app.MigrateDatabaseAsync();
+            await app.MigrateDatabaseAsync();
             await app.SeedDataAsync();
             await app.MigrateIdentityDatabaseAsync();
             await app.SeedIdentityDataAsync();
@@ -144,13 +120,13 @@ namespace ECommerceWeb
 
             app.UseHttpsRedirection();
             app.UseStaticFiles(); // Enable serving static files
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
 
-            app.Run(); 
+            app.Run();
 
             #endregion
         }

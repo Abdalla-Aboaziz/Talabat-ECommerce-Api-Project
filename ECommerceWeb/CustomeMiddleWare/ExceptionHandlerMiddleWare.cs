@@ -1,5 +1,4 @@
 ﻿using ECommerce.Service.Exceptions;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerceWeb.CustomeMiddleWare
 {
@@ -45,7 +44,7 @@ namespace ECommerceWeb.CustomeMiddleWare
 
         private static async Task HandelNotFoundEndPointAsync(HttpContext context)
         {
-            if (context.Response.StatusCode == StatusCodes.Status404NotFound)
+            if (context.Response.StatusCode == StatusCodes.Status404NotFound && !context.Response.HasStarted)
             {
                 // Log 404 errors(EndPoint Not Found)
                 var response = new ProblemDetails

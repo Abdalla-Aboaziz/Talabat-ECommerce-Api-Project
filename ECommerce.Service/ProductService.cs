@@ -56,7 +56,7 @@ namespace ECommerce.Service
             if (product is null )
             {
                // throw new ProductNotFoundException(id);
-                Error.NotFound("Proudct Not Found",$"Proudct with Id{id} Not Found");
+              return  Error.NotFound("Proudct Not Found",$"Proudct with Id : {id} Not Found");
 
             }
             // mapping from Product to ProductDTO

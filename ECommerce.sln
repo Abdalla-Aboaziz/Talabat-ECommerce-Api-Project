@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.ServiceAbstractio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InfrastructureLayer", "InfrastructureLayer", "{BE69900A-76F7-4BFC-A4E5-FC30599C523E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Presistance", "ECommerce.Presistance\ECommerce.Presistance.csproj", "{0552E900-1C10-47F0-A87B-76443FF6C8E9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommercePersistence", "ECommerce.Presistance\ECommercePersistence.csproj", "{0552E900-1C10-47F0-A87B-76443FF6C8E9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PresentationLayer", "PresentationLayer", "{4E13F072-F643-4B02-9746-5D9A9A912B25}"
 EndProject

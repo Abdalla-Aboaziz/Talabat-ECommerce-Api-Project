@@ -18,16 +18,17 @@ namespace ECommerce.Presistance.Repository
         {
           _dbContext = dbContext;
         }
+        //  Return Sutable Repo For Any Entity IAsked Without Mention In UnitOfWork
         public IGenericRepository<TEntity, TKey> GetRepository<TEntity, TKey>() where TEntity : BaseEnitiy<TKey>
         {
-            var entityType = typeof(TEntity);
-            if (_repository.TryGetValue(entityType, out object? repository))
+            var entityType = typeof(TEntity); // Type Of Asked Entity
+            if (_repository.TryGetValue(entityType, out object? repository)) // If Exist 
             {
-                return (IGenericRepository<TEntity, TKey>)repository;
+                return (IGenericRepository<TEntity, TKey>)repository; //Retun Object
             }
-
+            // If Not Create NewOne
             var newRepository = new GenericRepository<TEntity, TKey>(_dbContext);
-            _repository[entityType] = newRepository;
+            _repository[entityType] = newRepository; //Before Return Add In Dictionary
             return newRepository;
 
         }

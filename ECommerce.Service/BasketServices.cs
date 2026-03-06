@@ -28,7 +28,7 @@ namespace ECommerce.Service
 
             var CreatedOrUpdatedBasket = await _basketRepository.CreateOrUpdateBasketAsync(CustomeBasket);
 
-            return _mapper.Map<CustomerBasket,BasketDtos>(CreatedOrUpdatedBasket);
+            return _mapper.Map<CustomerBasket,BasketDtos>(CreatedOrUpdatedBasket!);
 
         }
 

@@ -30,7 +30,7 @@ namespace ECommerce.Presentation.Controllers
 
             }
         }
-
+        // Handel Result With Value
         protected ActionResult<Tvalue> HandelResult<Tvalue>(Result<Tvalue> result)
         {
             if (result.IsSuccess)
@@ -48,7 +48,7 @@ namespace ECommerce.Presentation.Controllers
         // Handel Problems
         private ActionResult HandelProblem(IReadOnlyList<Error> errors)
         {
-            // if Not Found Error => return 500 Internal Server Error
+            // if No Errors Are Provided => return 500 Internal Server Error
             if (errors.Count == 0) return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "Un Expected Error");
 
            
