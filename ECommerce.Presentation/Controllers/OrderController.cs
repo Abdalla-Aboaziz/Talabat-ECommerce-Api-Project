@@ -24,12 +24,42 @@ namespace ECommerce.Presentation.Controllers
         public async Task<ActionResult<OrderToReturnDto>> CreateOrder(OrderDto orderDto)
         {
             var Email = User.FindFirstValue(ClaimTypes.Email);
-            var order = await _orderService.CreateOrderAsync( orderDto, Email!);
-            return HandelResult(order);
+            var result= await _orderService.CreateOrderAsync( orderDto, Email!);
+            return HandelResult(result);
 
+        }
+
+        [HttpGet("deliveryMethods")]
+        public async Task<IActionResult> GetAllDeliveryMethods()
+        {
+            var result = await _orderService.GetAllDeliveryMethodsAsync();
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetOrderForSpecificUser()
+        {
+            var Email = User.FindFirstValue(ClaimTypes.Email);
+            var result = await _orderService.GetOrdersForUserAsync(Email!);
+            return Ok(result);
+
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<ActionResult<OrderToReturnDto>> GetOrderByIdForSpecificUser(Guid id)
+        {
+            var Email = User.FindFirstValue(ClaimTypes.Email);
+            var result = await _orderService.GetOrderByIdAsync(id, Email!);
+            return HandelResult(result);
 
         }
 
 
-    }
+
+
+
+
+        }
 }

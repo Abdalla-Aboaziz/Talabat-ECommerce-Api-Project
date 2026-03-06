@@ -2,6 +2,7 @@
 
 namespace ECommerce.Domain.Entities.OrderModules
 {
+    //Part of Order Entity
     public class OrderAddress
     {
         public string FirstName { get; set; }=default!;

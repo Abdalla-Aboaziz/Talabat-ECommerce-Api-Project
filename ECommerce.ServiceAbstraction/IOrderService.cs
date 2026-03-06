@@ -13,5 +13,9 @@ namespace ECommerce.ServiceAbstraction
         // Create Order
         // OrderDto ,Email=>Order To Return Dto 
         Task<Result<OrderToReturnDto>> CreateOrderAsync(OrderDto orderDto, string Email);
+        Task<IEnumerable<DeliveryMethodDto>> GetAllDeliveryMethodsAsync();
+        Task<Result<OrderToReturnDto>> GetOrderByIdAsync(Guid id, string Email);
+        Task<IEnumerable<OrderToReturnDto>> GetOrdersForUserAsync(string Email);
+
     }
 }

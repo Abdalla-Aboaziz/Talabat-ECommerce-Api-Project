@@ -24,6 +24,8 @@ namespace ECommerce.Service.MappingProfiles
                 .ForMember(d => d.DeliveryMethod, o => o.MapFrom(s => s.DeliveryMethod.ShortName))
                 .ForMember(d => d.OrderStatus, o => o.MapFrom(s => s.OrderStatus.ToString()))
                 .ForMember(d => d.Total, o => o.MapFrom(s => s.getTotal()));
+
+            CreateMap<DeliveryMethod, DeliveryMethodDto>();
         }
     }
 }

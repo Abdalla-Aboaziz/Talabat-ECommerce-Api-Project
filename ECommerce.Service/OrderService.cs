@@ -3,6 +3,7 @@ using ECommerce.Domain.Contracts;
 using ECommerce.Domain.Entities.BasketModules;
 using ECommerce.Domain.Entities.OrderModules;
 using ECommerce.Domain.Entities.ProductModules;
+using ECommerce.Service.Specifications;
 using ECommerce.ServiceAbstraction;
 using ECommerce.Shared.CommonResult;
 using ECommerce.Shared.OrderDtos;
@@ -29,24 +30,28 @@ namespace ECommerce.Service
         public async Task<Result<OrderToReturnDto>> CreateOrderAsync(OrderDto orderDto, string Email)
         {
             // Map Addres 
+            // 3. Get OrderAddress
             var OrderAddres = _mapper.Map<OrderAddress>(orderDto.Address);
+            // 5.1 Get Basket From Basket Repository=> get BasketId for OrderItems
             var Basket = await _basketRepository.GetBasketAsync(orderDto.BasketId);
             if (Basket is null) return Error.NotFound("Basket not found",$"Basket with id {orderDto.BasketId} Not Found ");
-
-            List<OrderItem> orderItems = new List<OrderItem>();
-            foreach (var item in Basket.Items)
-            {
-                var Proudct = await _unitOfWork.GetRepository<Product,int>().GetByIdAsync(item.Id);
-                if (Proudct is null) return Error.NotFound("Product not found", $"Product with id {item.Id} Not Found ");
+            // 5. Get OrderItems
+                List<OrderItem> orderItems = new List<OrderItem>();
+                // 5.2Convert Every Basket Item To OrderItem 
+                foreach (var item in Basket.Items)
+                {
+                    var Proudct = await _unitOfWork.GetRepository<Product,int>().GetByIdAsync(item.Id);
+                    if (Proudct is null) return Error.NotFound("Product not found", $"Product with id {item.Id} Not Found ");
                  
-                orderItems.Add(CreateOrderItem(item, Proudct));
+                    orderItems.Add(CreateOrderItem(item, Proudct));
 
-            }
+                }
+            // 4. Get Delivery Method
             var DeliveryMethod = await _unitOfWork.GetRepository<DeliveryMethod, int>().GetByIdAsync(orderDto.DeliveryMethodId);
             if ( DeliveryMethod is null ) return Error.NotFound("Delivery method not found", $"Delivery method with id {orderDto.DeliveryMethodId} Not Found ");
-
+            // 6. Calculate Subtotal
             var subtotal = orderItems.Sum(item => item.Price * item.Quantity);
-
+            // 2. Create Order Object
             var order = new Order
             {
                 Address = OrderAddres,
@@ -55,12 +60,41 @@ namespace ECommerce.Service
                 Subtotal = subtotal,
                 UserEmail = Email
             };
+            // 1. Add Order To Database
             await _unitOfWork.GetRepository<Order,Guid>().AddAsync(order);
            int result = await _unitOfWork.SaveChangesAsync();
             if (result==0) return Error.Failure("Failed to create order", "An error occurred while creating the order. Please try again.");
             return _mapper.Map<OrderToReturnDto>(order);
 
 
+        }
+
+        public async Task<IEnumerable<DeliveryMethodDto>> GetAllDeliveryMethodsAsync()
+        {
+           var Delivery=await _unitOfWork.GetRepository<DeliveryMethod,int>().GetAllAsync();
+            return _mapper.Map<IEnumerable<DeliveryMethodDto>>(Delivery);
+        }
+
+        public async Task<Result<OrderToReturnDto>> GetOrderByIdAsync(Guid id, string Email)
+        {
+            var spec = new OrderSpecifications(id, Email);
+             var order= await _unitOfWork.GetRepository<Order,Guid>().GetByIdAsync(spec);
+            if (order is null) return Error.NotFound("Order not found", $"Order with id {id} Not Found ");
+            return _mapper.Map<OrderToReturnDto>(order);
+
+        }
+
+        public async Task<IEnumerable<OrderToReturnDto>> GetOrdersForUserAsync(string Email)
+        {
+            var spec = new OrderSpecifications(Email);
+
+            var orders = await _unitOfWork
+                .GetRepository<Order, Guid>()
+                .GetAllAsync(spec);
+
+            var mappedOrders = _mapper.Map<IEnumerable<OrderToReturnDto>>(orders);
+
+            return mappedOrders; 
         }
 
         #region Helper Method
@@ -77,7 +111,8 @@ namespace ECommerce.Service
                 Price = product.Price,
                 Quantity = item.Quantity
             };
-        } 
+        }
+
         #endregion
     }
 }
