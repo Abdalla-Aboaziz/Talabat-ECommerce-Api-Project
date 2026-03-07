@@ -52,13 +52,20 @@ namespace ECommerce.Service
             // 6. Calculate Subtotal
             var subtotal = orderItems.Sum(item => item.Price * item.Quantity);
             // 2. Create Order Object
+            // 7. TODO :: PaymentIntendId
+            //Check order Exists
+            var spec = new OrderWithPaymentIntentSpecification(Basket.PaymentIntentId);
+            var existorder= await _unitOfWork.GetRepository<Order, Guid>().GetByIdAsync(spec);
+            if(existorder is not null) _unitOfWork.GetRepository<Order, Guid>().Remove(existorder);
+             string PaymentIntendId = Basket.PaymentIntentId;
             var order = new Order
             {
                 Address = OrderAddres,
                 DeliveryMethod = DeliveryMethod,
                 Items = orderItems,
                 Subtotal = subtotal,
-                UserEmail = Email
+                UserEmail = Email,
+                PaymentIntendId=Basket.PaymentIntentId
             };
             // 1. Add Order To Database
             await _unitOfWork.GetRepository<Order,Guid>().AddAsync(order);
