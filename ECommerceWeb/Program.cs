@@ -73,6 +73,7 @@ namespace ECommerceWeb
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtOptions:secretKey"]!))
                 };
             });
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
 
             #endregion
 

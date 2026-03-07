@@ -32,8 +32,12 @@ namespace ECommerce.Service
         }
         public async Task<Result<BasketDtos>> CreatePaymentIntentAsync(string BasketId)
         {
+            // Calculate Amount = Subtota+ DeliveryMethod Cost
+
+            // Get Basket By Id
             var Basket =await _basketRepository.GetBasketAsync(BasketId);
             if (Basket == null) return Error.NotFound();
+            //Check Proudct And Its Price 
             foreach (var item in Basket.Items)
             {
                 var Product = await _unitOfWork.GetRepository<Product, int>().GetByIdAsync(item.Id);
@@ -41,12 +45,15 @@ namespace ECommerce.Service
                 item.Price= Product.Price;
 
             }
+            //Calculate SubTotal
             var subTotal = Basket.Items.Sum(i => i.Price * i.Quantity);
+            //Get Delivery Mehod By Id
             if(!Basket.DeliveryMethodId.HasValue) return Error.NotFound();
             var delivery = await _unitOfWork.GetRepository<DeliveryMethod, int>().GetByIdAsync(Basket.DeliveryMethodId.Value);
             Basket.ShippingCost = delivery!.Price;
 
             var Amount = subTotal + delivery.Price;
+            //Send Amount To Stripe
             StripeConfiguration.ApiKey = _configuration["StripeOption:SecretKey"];
 
             PaymentIntentService paymentIntentService = new PaymentIntentService();
