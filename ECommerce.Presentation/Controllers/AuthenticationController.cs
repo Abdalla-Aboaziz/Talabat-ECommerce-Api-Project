@@ -1,5 +1,6 @@
 ﻿using ECommerce.ServiceAbstraction;
 using ECommerce.Shared.IdentityDtos;
+using ECommerce.Shared.OrderDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -50,6 +51,26 @@ namespace ECommerce.Presentation.Controllers
         {
             var email = User.FindFirstValue(ClaimTypes.Email);
             var result = await _authenticationSerivce.GetUserByEmailAsync(email!);
+            return HandelResult(result);
+
+        }
+       
+
+        [HttpGet("Address")]
+        [Authorize]
+        public async Task<ActionResult<IdentityAddressDto>> GetCurrentUserAddress()
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var result = await _authenticationSerivce.GetCurrentUserAddressAsync(email!);
+            return HandelResult(result);
+
+        }
+        [HttpPut("Address")]
+        [Authorize]
+        public async Task<ActionResult<IdentityAddressDto>> UpdateCurrentUserAddress(IdentityAddressDto addressDto)
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var result = await _authenticationSerivce.UpdateCurrentUserAddressAsync(addressDto, email!);
             return HandelResult(result);
 
         }
