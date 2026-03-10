@@ -23,7 +23,7 @@ namespace ECommerce.Service.MappingProfiles
             }
             var BaseUrl = _configuration.GetSection("URLs")["BaseURL"];
             if (string.IsNullOrEmpty(BaseUrl)) return string.Empty;
-            return $" {BaseUrl}{source.Product.PictureUrl}";
+            return $"{BaseUrl}/{source.Product.PictureUrl}";
 
         }
 

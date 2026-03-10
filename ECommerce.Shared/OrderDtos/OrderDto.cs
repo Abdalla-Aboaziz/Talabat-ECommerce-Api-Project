@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace ECommerce.Shared.OrderDtos
 {
-   public record OrderDto(string BasketId,int DeliveryMethodId,AddressDto Address);
+   public record OrderDto(string BasketId,int DeliveryMethodId,AddressDto ShipToAddress);
 }

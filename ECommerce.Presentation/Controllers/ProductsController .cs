@@ -9,21 +9,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace ECommerce.Presentation.Controllers
 {
     
-    public class ProductController : ApiBaseController
+    public class ProductsController : ApiBaseController
     {
         private readonly IProductServices _productServices;
 
-        public ProductController(IProductServices productServices)
+        public ProductsController(IProductServices productServices)
         {
             _productServices = productServices;
         }
         // Get All Products
 
         [HttpGet]
-        [RedisCashe]
+       // [RedisCashe]
        
         // GET: api/Product
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts([FromQuery]ProductQueryParams queryParams)
+        public async Task<ActionResult<PaginatedResult<ProductDTO>>> GetAllProducts([FromQuery]ProductQueryParams queryParams)
         {
             var products = await _productServices.GetAllProductsAsync(queryParams);
             return Ok(products);

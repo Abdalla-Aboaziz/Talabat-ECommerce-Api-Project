@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace ECommerce.Presentation.Controllers
 {
-    public class AuthenticationController : ApiBaseController
+    public class accountsController : ApiBaseController
     {
         private readonly IAuthenticationSerivce _authenticationSerivce;
 
-        public AuthenticationController(IAuthenticationSerivce authenticationSerivce)
+        public accountsController(IAuthenticationSerivce authenticationSerivce)
         {
             _authenticationSerivce = authenticationSerivce;
         }

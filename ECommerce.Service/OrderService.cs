@@ -31,7 +31,7 @@ namespace ECommerce.Service
         {
             // Map Addres 
             // 3. Get OrderAddress
-            var OrderAddres = _mapper.Map<OrderAddress>(orderDto.Address);
+            var OrderAddres = _mapper.Map<OrderAddress>(orderDto.ShipToAddress);
             // 5.1 Get Basket From Basket Repository=> get BasketId for OrderItems
             var Basket = await _basketRepository.GetBasketAsync(orderDto.BasketId);
             if (Basket is null) return Error.NotFound("Basket not found",$"Basket with id {orderDto.BasketId} Not Found ");
@@ -55,9 +55,13 @@ namespace ECommerce.Service
             // 7. TODO :: PaymentIntendId
             //Check order Exists
             var spec = new OrderWithPaymentIntentSpecification(Basket.PaymentIntentId);
-            var existorder= await _unitOfWork.GetRepository<Order, Guid>().GetByIdAsync(spec);
-            if(existorder is not null) _unitOfWork.GetRepository<Order, Guid>().Remove(existorder);
-             string PaymentIntendId = Basket.PaymentIntentId;
+            var existorder = await _unitOfWork.GetRepository<Order, Guid>().GetByIdAsync(spec);
+            if (existorder is not null)
+            {
+                _unitOfWork.GetRepository<Order, Guid>().Remove(existorder);
+                await _unitOfWork.SaveChangesAsync(); 
+            }
+
             var order = new Order
             {
                 Address = OrderAddres,
@@ -65,14 +69,13 @@ namespace ECommerce.Service
                 Items = orderItems,
                 Subtotal = subtotal,
                 UserEmail = Email,
-                PaymentIntendId=Basket.PaymentIntentId
+                PaymentIntendId = Basket.PaymentIntentId
             };
-            // 1. Add Order To Database
-            await _unitOfWork.GetRepository<Order,Guid>().AddAsync(order);
-           int result = await _unitOfWork.SaveChangesAsync();
-            if (result==0) return Error.Failure("Failed to create order", "An error occurred while creating the order. Please try again.");
-            return _mapper.Map<OrderToReturnDto>(order);
 
+            await _unitOfWork.GetRepository<Order, Guid>().AddAsync(order);
+            int result = await _unitOfWork.SaveChangesAsync();
+            if (result == 0) return Error.Failure("Failed to create order", "An error occurred while creating the order.");
+            return _mapper.Map<OrderToReturnDto>(order);
 
         }
 

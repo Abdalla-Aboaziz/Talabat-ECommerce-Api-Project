@@ -20,6 +20,11 @@ namespace ECommerce.Presistance.Repository
         }
         public async Task AddAsync(TEnity entity)=> await _dbContext.Set<TEnity>().AddAsync(entity);
 
+        public async Task<int> CountAsync(ISpecification<TEnity, TKey> specification)
+        {
+           return await SpecificationEvaluator.CreateQuery(_dbContext.Set<TEnity>(), specification).CountAsync(); // we are using CountAsync to get count of entities based on specification
+        }
+
         public async Task<IEnumerable<TEnity>> GetAllAsync() =>await _dbContext.Set<TEnity>().ToListAsync();
 
         public async Task<IEnumerable<TEnity>> GetAllAsync(ISpecification<TEnity, TKey> specification)
