@@ -21,7 +21,7 @@ namespace ECommerce.Presentation.Controllers
 
         [HttpGet]
         [RedisCashe]
-        [Authorize]
+       
         // GET: api/Product
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts([FromQuery]ProductQueryParams queryParams)
         {

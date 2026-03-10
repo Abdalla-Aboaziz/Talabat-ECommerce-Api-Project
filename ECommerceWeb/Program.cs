@@ -74,6 +74,15 @@ namespace ECommerceWeb
                 };
             });
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddCors(opt =>
+            {
+               opt.AddPolicy("MyPolicy",policy =>
+                {
+                    policy.AllowAnyOrigin()  // Use WithOrigins for specific origins
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
 
             #endregion
 
@@ -121,6 +130,7 @@ namespace ECommerceWeb
 
             app.UseHttpsRedirection();
             app.UseStaticFiles(); // Enable serving static files
+            app.UseCors("MyPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 
