@@ -20,7 +20,7 @@ namespace ECommerce.Presentation.Controllers
         // Get All Products
 
         [HttpGet]
-       // [RedisCashe]
+        //[RedisCashe]
        
         // GET: api/Product
         public async Task<ActionResult<PaginatedResult<ProductDTO>>> GetAllProducts([FromQuery]ProductQueryParams queryParams)
