@@ -26,8 +26,11 @@ namespace Admin.Dashboard
                 option.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
             });
 
-            builder.Services.AddIdentityCore<ApplicationUser>().AddRoles<IdentityRole>()
-               .AddEntityFrameworkStores<StoreIdentityDbContext>().AddDefaultTokenProviders();
+            //builder.Services.AddIdentityCore<ApplicationUser>().AddRoles<IdentityRole>()
+            //   .AddEntityFrameworkStores<StoreIdentityDbContext>().AddDefaultTokenProviders();
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+            .AddEntityFrameworkStores<StoreIdentityDbContext>()
+            .AddDefaultTokenProviders();
             #endregion
 
             var app = builder.Build();
@@ -42,13 +45,13 @@ namespace Admin.Dashboard
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=Admin}/{action=Login}/{id?}")
                 .WithStaticAssets();
 
             app.Run();
