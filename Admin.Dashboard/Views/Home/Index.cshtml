@@ -1,8 +1,277 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    .stat-cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: border-color .2s;
+    }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+        }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+        .stat-icon.blue {
+            background: rgba(59,130,246,.15);
+            color: #60a5fa;
+        }
+
+        .stat-icon.green {
+            background: rgba(16,185,129,.15);
+            color: #34d399;
+        }
+
+        .stat-icon.yellow {
+            background: rgba(245,158,11,.15);
+            color: #fbbf24;
+        }
+
+        .stat-icon.red {
+            background: rgba(239,68,68,.15);
+            color: #f87171;
+        }
+
+    .stat-info .stat-label {
+        font-size: 12px;
+        color: var(--text-3);
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .stat-info .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-1);
+        line-height: 1;
+    }
+
+    .stat-info .stat-sub {
+        font-size: 11px;
+        color: var(--success);
+        margin-top: 4px;
+    }
+
+    .charts-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .chart-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px 24px;
+    }
+
+    .chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .chart-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-1);
+    }
+
+    .chart-badge {
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: rgba(59,130,246,.1);
+        color: #60a5fa;
+        border: 1px solid rgba(59,130,246,.2);
+        font-weight: 500;
+    }
+
+    canvas {
+        width: 100% !important;
+    }
+
+    @@media (max-width: 900px) {
+        .stat-cards {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .charts-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<h1>Dashboard</h1>
+
+<!-- STAT CARDS -->
+<div class="stat-cards">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-box"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Total Products</div>
+            <div class="stat-value">@(ViewBag.ProductCount ?? 0)</div>
+            <div class="stat-sub"><i class="fas fa-arrow-up"></i> 12% this month</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value">@(ViewBag.UserCount ?? 0)</div>
+            <div class="stat-sub"><i class="fas fa-arrow-up"></i> 8% this month</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fas fa-shopping-cart"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-value">230</div>
+            <div class="stat-sub"><i class="fas fa-arrow-up"></i> 5% this month</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red"><i class="fas fa-dollar-sign"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Revenue</div>
+            <div class="stat-value">$12,500</div>
+            <div class="stat-sub"><i class="fas fa-arrow-up"></i> 18% this month</div>
+        </div>
+    </div>
 </div>
+
+<!-- CHARTS -->
+<div class="charts-row">
+    <div class="chart-card">
+        <div class="chart-header">
+            <span class="chart-title">Sales Overview</span>
+            <span class="chart-badge">2024</span>
+        </div>
+        <canvas id="salesChart" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+        <div class="chart-header">
+            <span class="chart-title">Products by Category</span>
+            <span class="chart-badge">Live</span>
+        </div>
+        <canvas id="categoryChart" height="220"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ── Sales Line Chart ──
+        new Chart(document.getElementById('salesChart'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Sales',
+                    data: [500, 680, 720, 850, 1050, 1250],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.08)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#3b82f6',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1f2937',
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                        titleColor: '#f9fafb',
+                        bodyColor: '#d1d5db',
+                        padding: 10
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#9ca3af', font: { size: 11 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#9ca3af', font: { size: 11 } }
+                    }
+                }
+            }
+        });
+
+        // ── Category Donut Chart ──
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Tops', 'Bottoms', 'Outerwear', 'Footwear', 'Accessories'],
+                datasets: [{
+                    data: [35, 25, 20, 12, 8],
+                    backgroundColor: [
+                        '#3b82f6',
+                        '#10b981',
+                        '#f59e0b',
+                        '#8b5cf6',
+                        '#ef4444'
+                    ],
+                    borderColor: '#1f2937',
+                    borderWidth: 3,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#d1d5db',
+                            font: { size: 12 },
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyleWidth: 8
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1f2937',
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                        titleColor: '#f9fafb',
+                        bodyColor: '#d1d5db',
+                        padding: 10
+                    }
+                }
+            }
+        });
+    </script>
+}

@@ -1,6 +1,8 @@
+using ECommerce.Domain.Contracts;
 using ECommerce.Domain.Entities.IdentityModule;
 using ECommerce.Presistance.Data.DBContexts;
 using ECommerce.Presistance.IdentityData.DbContext;
+using ECommerce.Presistance.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +16,7 @@ namespace Admin.Dashboard
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 
             #region DataBaseConfigration
             builder.Services.AddDbContext<StoreDbContext>(opt =>

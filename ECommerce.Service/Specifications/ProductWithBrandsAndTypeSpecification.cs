@@ -15,7 +15,7 @@ namespace ECommerce.Service.Specifications
 
         }
         //  (Get All Products)
-        public ProductWithBrandsAndTypeSpecification(ProductQueryParams queryParams)
+        public ProductWithBrandsAndTypeSpecification(ProductQueryParams queryParams,bool forDashboard =false)
             : base(p => (!queryParams.BrandId.HasValue || p.BrandId == queryParams.BrandId.Value) && (queryParams.TypeId == null || p.TypeId == queryParams.TypeId) &&
             (string.IsNullOrEmpty(queryParams.Search) || p.Name.ToLower().Contains(queryParams.Search.ToLower())))
         {
@@ -45,7 +45,8 @@ namespace ECommerce.Service.Specifications
                     break;
             }
             // Pagination
-            ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
+            if (!forDashboard)
+                ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
         }
     }
 }
